@@ -8,11 +8,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class DashboardService {
     private final BranchRepository branchRepository;
     private final ProductRepository productRepository;
     private final SaleRepository saleRepository;
+
+    public DashboardService(BranchRepository branchRepository,
+            ProductRepository productRepository,
+            SaleRepository saleRepository) {
+        this.branchRepository = branchRepository;
+        this.productRepository = productRepository;
+        this.saleRepository = saleRepository;
+    }
 
     public DashboardSummary getSummary() {
         Double totalRevenue = saleRepository.sumTotalAmount();
