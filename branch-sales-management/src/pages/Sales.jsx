@@ -84,9 +84,18 @@ const Sales = () => {
         <div className="space-y-8">
             <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-gray-800">Sales Report</h2>
-                <div className="flex items-center space-x-2 text-sm text-gray-500">
-                    <CalendarIcon className="w-5 h-5" />
-                    <span>Last 30 Days</span>
+                <div className="flex items-center space-x-4">
+                    <button
+                        onClick={() => window.open('http://localhost:8080/api/reports/sales/pdf', '_blank')}
+                        className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold transition-all shadow-sm"
+                    >
+                        <DocumentTextIcon className="w-5 h-5" />
+                        <span>Download PDF</span>
+                    </button>
+                    <div className="flex items-center space-x-2 text-sm text-gray-500">
+                        <CalendarIcon className="w-5 h-5" />
+                        <span>Last 30 Days</span>
+                    </div>
                 </div>
             </div>
 
