@@ -2,7 +2,6 @@ package com.branchsales.service;
 
 import com.branchsales.entity.Sale;
 import com.branchsales.repository.SaleRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;

@@ -1,10 +1,5 @@
 package com.branchsales.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 public class DashboardSummary {
     private long offlineBranches;
     private long totalProducts;
