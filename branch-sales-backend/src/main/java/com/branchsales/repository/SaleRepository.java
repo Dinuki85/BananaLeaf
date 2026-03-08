@@ -15,4 +15,8 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
     @Query("SELECT new com.branchsales.dto.BranchPerformanceDTO(s.branch.name, SUM(s.totalAmount)) " +
             "FROM Sale s GROUP BY s.branch.name")
     List<BranchPerformanceDTO> findBranchPerformance();
+
+    @Query("SELECT s FROM Sale s WHERE (:branchId IS NULL OR s.branch.id = :branchId) " +
+            "AND s.saleDateTime BETWEEN :startDate AND :endDate")
+    List<Sale> findByFilters(Long branchId, java.time.LocalDateTime startDate, java.time.LocalDateTime endDate);
 }
