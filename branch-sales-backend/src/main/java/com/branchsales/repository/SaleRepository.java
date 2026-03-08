@@ -12,7 +12,7 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
     @Query("SELECT SUM(s.totalAmount) FROM Sale s")
     Double sumTotalAmount();
 
-    @Query("SELECT new com.branchsales.dto.BranchPerformanceDTO(s.branchName, SUM(s.totalAmount)) " +
-            "FROM Sale s GROUP BY s.branchName")
+    @Query("SELECT new com.branchsales.dto.BranchPerformanceDTO(s.branch.name, SUM(s.totalAmount)) " +
+            "FROM Sale s GROUP BY s.branch.name")
     List<BranchPerformanceDTO> findBranchPerformance();
 }

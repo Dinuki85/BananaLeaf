@@ -21,8 +21,9 @@ public class Sale {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "branch_name", nullable = false)
-    private String branchName;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "branch_id", nullable = false)
+    private Branch branch;
 
     @Column(name = "invoice_local", nullable = false)
     private String invoiceLocal;

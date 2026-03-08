@@ -56,7 +56,7 @@ public class ReportService {
             table.addHeaderCell(new Paragraph("Status").setBold());
 
             for (Sale sale : sales) {
-                table.addCell(sale.getBranchName() != null ? sale.getBranchName() : "N/A");
+                table.addCell(sale.getBranch() != null ? sale.getBranch().getName() : "N/A");
                 table.addCell(sale.getInvoiceLocal() != null ? sale.getInvoiceLocal() : "N/A");
                 table.addCell(sale.getSaleDateTime() != null ? sale.getSaleDateTime().toString() : "N/A");
                 table.addCell(String.format("$%.2f", sale.getTotalAmount()));
