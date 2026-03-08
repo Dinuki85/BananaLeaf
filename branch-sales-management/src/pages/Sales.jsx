@@ -55,9 +55,15 @@ const Sales = () => {
         try {
             setLoading(true);
             const response = await api.get('/sales');
-            setSales(response.data);
+            if (response.data && Array.isArray(response.data)) {
+                setSales(response.data);
+            } else {
+                console.error('Unexpected API response format:', response.data);
+                setSales([]);
+            }
         } catch (err) {
             console.error('Error fetching sales:', err);
+            // Optionally set an error state to show a message in the UI
         } finally {
             setLoading(false);
         }
