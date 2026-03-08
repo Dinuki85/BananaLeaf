@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
+import DownloadReportModal from '../components/DownloadReportModal';
 import StatusBadge from '../components/StatusBadge';
 import {
     EyeIcon,
@@ -14,6 +15,7 @@ const Sales = () => {
     const [sales, setSales] = useState([]);
     const [loading, setLoading] = useState(true);
     const [modalOpen, setModalOpen] = useState(false);
+    const [downloadModalOpen, setDownloadModalOpen] = useState(false);
     const [selectedSale, setSelectedSale] = useState(null);
     const [loadingItems, setLoadingItems] = useState(false);
 
@@ -96,7 +98,7 @@ const Sales = () => {
                 <h2 className="text-2xl font-bold text-gray-800">Sales Report</h2>
                 <div className="flex items-center space-x-4">
                     <button
-                        onClick={() => window.open('http://localhost:8080/api/reports/sales/pdf', '_blank')}
+                        onClick={() => setDownloadModalOpen(true)}
                         className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold transition-all shadow-sm"
                     >
                         <DocumentTextIcon className="w-5 h-5" />
@@ -176,12 +178,14 @@ const Sales = () => {
                             </div>
                         </div>
                     </div>
-                ) : (
-                    <div className="text-center py-10 text-red-500 font-medium">
-                        Failed to load items. Please try again later.
-                    </div>
-                )}
+                ) : null}
             </Modal>
+
+            {/* Download Report Modal */}
+            <DownloadReportModal 
+                isOpen={downloadModalOpen}
+                onClose={() => setDownloadModalOpen(false)}
+            />
         </div>
     );
 };

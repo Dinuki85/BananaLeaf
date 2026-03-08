@@ -40,10 +40,10 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                                     <img
                                         src={logo}
                                         alt="Company Logo"
-                                        className={`transition-all duration-300 object-contain ${isOpen ? 'w-20 h-20 mb-4' : 'w-12 h-12'}`}
+                                        className={`transition-all duration-300 object-contain ${isOpen ? 'w-20 h-20 mb-4' : 'w-10 h-10'}`}
                                     />
                                     <span className="text-xl font-bold text-gray-800 whitespace-nowrap">
-                                        BranchSales
+                                        New Banana Leaf
                                     </span>
                                 </div>
                             </div>
