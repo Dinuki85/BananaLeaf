@@ -73,8 +73,9 @@ const Sales = () => {
         setModalOpen(true);
         setLoadingItems(true);
         try {
-            const response = await api.get(`/sales/${id}`);
-            setSelectedSale(response.data);
+            const saleResponse = await api.get(`/sales/${id}`);
+            const itemsResponse = await api.get(`/sales/${id}/items`);
+            setSelectedSale({ ...saleResponse.data, items: itemsResponse.data });
         } catch (err) {
             console.error('Error fetching sale details:', err);
         } finally {
