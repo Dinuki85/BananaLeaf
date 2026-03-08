@@ -18,7 +18,10 @@ const Sales = () => {
     const [loadingItems, setLoadingItems] = useState(false);
 
     const columns = [
-        { header: 'Branch Name', accessor: 'branchName' },
+        {
+            header: 'Branch Name',
+            render: (row) => row.branch?.name || row.branchName || 'N/A'
+        },
         { header: 'Invoice ID', accessor: 'invoiceLocal' },
         {
             header: 'Date / Time',
@@ -130,7 +133,7 @@ const Sales = () => {
                                 <p className="text-xs text-gray-400 uppercase font-bold tracking-wider">Branch</p>
                                 <div className="flex items-center text-gray-700 font-semibold">
                                     <BuildingStorefrontIcon className="w-4 h-4 mr-2 text-green-600" />
-                                    {selectedSale.branchName}
+                                    {selectedSale.branch?.name}
                                 </div>
                             </div>
                             <div className="text-right">
