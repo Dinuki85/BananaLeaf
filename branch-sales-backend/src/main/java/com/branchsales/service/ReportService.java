@@ -4,17 +4,25 @@ import com.branchsales.entity.Branch;
 import com.branchsales.entity.Sale;
 import com.branchsales.repository.BranchRepository;
 import com.branchsales.repository.SaleRepository;
+import com.itextpdf.io.image.ImageData;
+import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.kernel.pdf.PdfPage;
+import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
+import com.itextpdf.kernel.pdf.extgstate.PdfExtGState;
 import com.itextpdf.layout.Document;
+import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.element.Cell;
+import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.properties.HorizontalAlignment;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -82,18 +90,38 @@ public class ReportService {
 
         System.out.println("Starting PDF document construction...");
 
-        // Header Section with Title
-        Table headerTable = new Table(UnitValue.createPercentArray(new float[]{1}));
+        // Header Section with Logo and Title
+        Table headerTable = new Table(UnitValue.createPercentArray(new float[]{1, 4}));
         headerTable.setWidth(UnitValue.createPercentValue(100));
+
+        try {
+            // First try loading from resources (works in JAR)
+            ImageData imageData;
+            try {
+                ClassPathResource res = new ClassPathResource("static/logo.png");
+                imageData = ImageDataFactory.create(res.getURL());
+            } catch (Exception e1) {
+                // Fallback to project relative path (works in IDE)
+                imageData = ImageDataFactory.create("src/main/resources/static/logo.png");
+            }
+            
+            Image logo = new Image(imageData);
+            logo.setHeight(60); 
+            headerTable.addCell(new Cell().add(logo).setBorder(Border.NO_BORDER));
+            System.out.println("Header logo added to PDF.");
+        } catch (Exception e) {
+            System.err.println("Note: Could not load header logo: " + e.getMessage());
+            headerTable.addCell(new Cell().setBorder(Border.NO_BORDER));
+        }
 
         Cell titleCell = new Cell().add(new Paragraph("NEW BANANA LEAF")
                 .setFontSize(24)
                 .setBold()
-                .setTextAlignment(TextAlignment.CENTER))
+                .setTextAlignment(TextAlignment.LEFT))
                 .add(new Paragraph("Sales Report")
                 .setFontSize(18)
                 .setItalic()
-                .setTextAlignment(TextAlignment.CENTER))
+                .setTextAlignment(TextAlignment.LEFT))
                 .setBorder(Border.NO_BORDER);
         headerTable.addCell(titleCell);
         document.add(headerTable);
@@ -178,6 +206,44 @@ public class ReportService {
                 .setFontSize(8)
                 .setTextAlignment(TextAlignment.CENTER)
                 .setFontColor(ColorConstants.GRAY));
+
+        // Adding Watermark to Every Page
+        try {
+            ImageData watermarkData;
+            try {
+                ClassPathResource res = new ClassPathResource("static/logo.png");
+                watermarkData = ImageDataFactory.create(res.getURL());
+            } catch (Exception e1) {
+                watermarkData = ImageDataFactory.create("src/main/resources/static/logo.png");
+            }
+
+            Image watermark = new Image(watermarkData);
+            watermark.setWidth(300); // As requested
+            watermark.setOpacity(0.15f); // As requested
+
+            int numberOfPages = pdf.getNumberOfPages();
+            PdfExtGState gState = new PdfExtGState().setFillOpacity(0.15f);
+
+            for (int i = 1; i <= numberOfPages; i++) {
+                PdfPage page = pdf.getPage(i);
+                PdfCanvas pdfCanvas = new PdfCanvas(page.newContentStreamAfter(), page.getResources(), pdf);
+                
+                float x = page.getPageSize().getWidth() / 2;
+                float y = page.getPageSize().getHeight() / 2;
+                
+                pdfCanvas.saveState();
+                pdfCanvas.setExtGState(gState);
+                
+                Canvas watermarkCanvas = new Canvas(pdfCanvas, page.getPageSize());
+                watermarkCanvas.showTextAligned(new Paragraph("").add(watermark), x, y, i, TextAlignment.CENTER, com.itextpdf.layout.properties.VerticalAlignment.MIDDLE, 0);
+                watermarkCanvas.close();
+                
+                pdfCanvas.restoreState();
+            }
+            System.out.println("Watermark added to " + numberOfPages + " pages.");
+        } catch (Exception e) {
+            System.err.println("Note: Could not add watermark: " + e.getMessage());
+        }
 
         document.close();
 
