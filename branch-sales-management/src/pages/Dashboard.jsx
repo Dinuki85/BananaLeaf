@@ -47,9 +47,7 @@ const Dashboard = () => {
             <div className="flex-1 space-y-8">
                 <div className="flex items-center justify-between">
                     <h2 className="text-2xl font-bold text-gray-800">Dashboard Overview</h2>
-                    <div className="px-4 py-2 bg-white rounded-lg shadow-sm text-sm text-gray-500 border border-gray-100">
-                        Real-time status: <span className="text-green-600 font-semibold italic">Connected</span>
-                    </div>
+
                 </div>
 
                 {error && (
@@ -84,7 +82,7 @@ const Dashboard = () => {
                     <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                         <div className="flex items-center justify-between mb-6">
                             <h3 className="text-lg font-bold text-gray-800">Branch Performance</h3>
-                            <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full uppercase tracking-wider">Grouped by Branch</span>
+
                         </div>
                         <div className="space-y-4">
                             {summary.branchSales && summary.branchSales.length > 0 ? (
