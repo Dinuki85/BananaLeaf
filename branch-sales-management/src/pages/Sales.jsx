@@ -104,10 +104,10 @@ const Sales = () => {
                         <DocumentTextIcon className="w-5 h-5" />
                         <span>Download PDF</span>
                     </button>
-                    <div className="flex items-center space-x-2 text-sm text-gray-500">
+                    {/*<div className="flex items-center space-x-2 text-sm text-gray-500">
                         <CalendarIcon className="w-5 h-5" />
                         <span>Last 30 Days</span>
-                    </div>
+                    </div>*/}
                 </div>
             </div>
 
@@ -182,7 +182,7 @@ const Sales = () => {
             </Modal>
 
             {/* Download Report Modal */}
-            <DownloadReportModal 
+            <DownloadReportModal
                 isOpen={downloadModalOpen}
                 onClose={() => setDownloadModalOpen(false)}
             />
