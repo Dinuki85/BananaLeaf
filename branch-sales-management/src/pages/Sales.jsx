@@ -25,7 +25,7 @@ const Sales = () => {
             render: (row) => {
                 if (row.branch?.name) return row.branch.name;
                 // If branch is null but id is 0 (or composite id ends in -0)
-                if (row.id?.endsWith('-0')) return 'Central Office';
+                if (row.id?.endsWith('-0')) return 'Unknown Branch';
                 return row.branchName || 'Unknown Branch';
             }
         },
