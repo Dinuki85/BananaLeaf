@@ -14,14 +14,20 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @AllArgsConstructor
 @Builder
 @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+@IdClass(InvoiceId.class)
 public class Invoice {
     @Id
     @Column(name = "idinvoice")
     @JsonProperty("invoiceLocal")
     private Integer idinvoice;
 
+    @Id
+    @Column(name = "branch_id")
+    private Long branchId;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "branch_id")
+    @JoinColumn(name = "branch_id", insertable = false, updatable = false)
+    @org.hibernate.annotations.NotFound(action = org.hibernate.annotations.NotFoundAction.IGNORE)
     private Branch branch;
 
     @Column(name = "date")
@@ -59,7 +65,7 @@ public class Invoice {
 
     @JsonProperty("id")
     public String getId() {
-        return idinvoice + "-" + (branch != null ? branch.getId() : "0");
+        return idinvoice + "-" + (branchId != null ? branchId : "0");
     }
 
     @JsonProperty("saleDateTime")

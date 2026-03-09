@@ -19,7 +19,10 @@ public class InvoiceItem {
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "invoice_idinvoice", referencedColumnName = "idinvoice")
+    @JoinColumns({
+        @JoinColumn(name = "invoice_idinvoice", referencedColumnName = "idinvoice"),
+        @JoinColumn(name = "branch_id", referencedColumnName = "branch_id")
+    })
     @JsonBackReference
     private Invoice invoice;
 

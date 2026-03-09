@@ -20,19 +20,26 @@ public class ProductService {
     }
 
     public ProductDTO addProduct(ProductDTO productDTO) {
+        Double priceToSave = productDTO.getPrice() != null ? productDTO.getPrice() : productDTO.getSellingPrice();
         MainItem mainItem = MainItem.builder()
                 .name(productDTO.getName())
-                .price(productDTO.getPrice())
+                .price(priceToSave)
+                .code(productDTO.getSku())
                 .build();
         MainItem saved = mainItemRepository.save(mainItem);
         return convertToDTO(saved);
     }
 
     private ProductDTO convertToDTO(MainItem item) {
+        String sku = item.getCode() != null ? item.getCode() : (item.getId() != null ? "PROD-" + item.getId() : "N/A");
+        
         return ProductDTO.builder()
                 .id(item.getId())
+                .sku(sku)
                 .name(item.getName())
                 .price(item.getPrice())
+                .sellingPrice(item.getPrice())
+                .active(true)
                 .category(item.getMainCategory() != null ? item.getMainCategory().getName() : "Uncategorized")
                 .build();
     }

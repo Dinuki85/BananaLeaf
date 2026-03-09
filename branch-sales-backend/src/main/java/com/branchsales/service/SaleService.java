@@ -54,11 +54,16 @@ public class SaleService {
     }
 
     private SalesDTO convertToDTO(Invoice invoice) {
+        String branchName = "Central Office";
+        if (invoice.getBranch() != null) {
+            branchName = invoice.getBranch().getName() != null ? invoice.getBranch().getName() : "Central Office";
+        }
+    
         return SalesDTO.builder()
                 .id(invoice.getId())
                 .invoiceLocal(invoice.getIdinvoice())
-                .branchName(invoice.getBranch() != null ? invoice.getBranch().getName() : "Central Office")
-                .branchId(invoice.getBranch() != null ? invoice.getBranch().getId() : 0L)
+                .branchName(branchName)
+                .branchId(invoice.getBranchId() != null ? invoice.getBranchId() : 0L)
                 .saleDateTime(invoice.getCreatedAt())
                 .totalAmount(invoice.getTotal())
                 .paymentType(invoice.getPaymentType())

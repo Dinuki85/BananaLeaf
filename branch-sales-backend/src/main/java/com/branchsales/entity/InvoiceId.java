@@ -6,7 +6,7 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class InvoiceItemId implements Serializable {
-    private Integer idMainItemHasInvoice;
-    private InvoiceId invoice;
+public class InvoiceId implements Serializable {
+    private Integer idinvoice;
+    private Long branchId;
 }

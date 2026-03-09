@@ -24,6 +24,9 @@ public class MainItem {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "price")
+    @Column(name = "sp")
     private Double price;
+
+    @Column(name = "code")
+    private String code;
 }

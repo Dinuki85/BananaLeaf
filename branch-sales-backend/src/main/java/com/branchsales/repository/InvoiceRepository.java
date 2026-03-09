@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 
 @Repository
 public interface InvoiceRepository extends JpaRepository<Invoice, Integer> {
-    @Query("SELECT i FROM Invoice i WHERE (:branchId IS NULL OR i.branch.id = :branchId) " +
+    @Query("SELECT i FROM Invoice i WHERE (:branchId IS NULL OR i.branchId = :branchId) " +
            "AND i.createdAt BETWEEN :startDate AND :endDate ORDER BY i.createdAt DESC")
     List<Invoice> findByFilters(@Param("branchId") Long branchId, 
                                 @Param("startDate") Timestamp startDate, 
