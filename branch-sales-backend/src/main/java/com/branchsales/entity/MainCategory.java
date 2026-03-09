@@ -12,9 +12,8 @@ import jakarta.persistence.*;
 public class MainCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idMain_category")
+    @Column(name = "idmain_category")
     private Long id;
 
     private String name;
-    private String status;
 }

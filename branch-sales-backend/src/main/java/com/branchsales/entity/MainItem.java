@@ -17,33 +17,13 @@ public class MainItem {
     @JsonProperty("id")
     private Long id;
 
-    @Column(name = "Main_category_idMain_category")
-    private Long categoryId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "main_category_idmain_category")
+    private MainCategory mainCategory;
 
     @Column(name = "name")
     private String name;
 
-    @Column(name = "code")
-    @JsonProperty("sku")
-    private String code;
-
-    @Column(name = "up")
-    private Double up;
-
-    @Column(name = "sp")
-    @JsonProperty("sellingPrice")
-    private Double sp;
-
-    @Column(name = "status")
-    private String status;
-
-    @JsonProperty("active")
-    public boolean isActive() {
-        return "1".equals(status);
-    }
-
-    @JsonProperty("active")
-    public void setActive(boolean active) {
-        this.status = active ? "1" : "0";
-    }
+    @Column(name = "price")
+    private Double price;
 }

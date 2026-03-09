@@ -11,8 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ProductDTO {
     private Long id;
-    private String sku;
     private String name;
-    private Double sellingPrice;
-    private boolean active;
+    private Double price;
+    private String category;
 }

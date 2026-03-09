@@ -14,7 +14,7 @@ public class ProductService {
     private final MainItemRepository mainItemRepository;
 
     public List<ProductDTO> getAllProducts() {
-        return mainItemRepository.findAll().stream()
+        return mainItemRepository.findAllWithCategory().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -22,9 +22,7 @@ public class ProductService {
     public ProductDTO addProduct(ProductDTO productDTO) {
         MainItem mainItem = MainItem.builder()
                 .name(productDTO.getName())
-                .code(productDTO.getSku())
-                .sp(productDTO.getSellingPrice())
-                .status(productDTO.isActive() ? "1" : "0")
+                .price(productDTO.getPrice())
                 .build();
         MainItem saved = mainItemRepository.save(mainItem);
         return convertToDTO(saved);
@@ -33,10 +31,9 @@ public class ProductService {
     private ProductDTO convertToDTO(MainItem item) {
         return ProductDTO.builder()
                 .id(item.getId())
-                .sku(item.getCode())
                 .name(item.getName())
-                .sellingPrice(item.getSp())
-                .active("1".equals(item.getStatus()))
+                .price(item.getPrice())
+                .category(item.getMainCategory() != null ? item.getMainCategory().getName() : "Uncategorized")
                 .build();
     }
 }
