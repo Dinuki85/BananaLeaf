@@ -55,11 +55,6 @@ const Products = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!formData.name || !formData.sku || !formData.sellingPrice) {
-            setMessage({ text: 'Please fill in all required fields.', type: 'error' });
-            return;
-        }
-
         try {
             setSubmitting(true);
             setMessage({ text: '', type: '' });
@@ -107,6 +102,7 @@ const Products = () => {
                                 </span>
                                 <input
                                     type="text"
+                                    required
                                     placeholder="e.g. Wireless Mouse"
                                     className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500/20 focus:border-green-600 outline-none transition-all"
                                     value={formData.name}
@@ -124,6 +120,7 @@ const Products = () => {
                                 </span>
                                 <input
                                     type="text"
+                                    required
                                     placeholder="e.g. WM-001"
                                     className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500/20 focus:border-green-600 outline-none transition-all"
                                     value={formData.sku}
@@ -141,6 +138,7 @@ const Products = () => {
                                 </span>
                                 <input
                                     type="number"
+                                    required
                                     step="0.01"
                                     placeholder="0.00"
                                     className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500/20 focus:border-green-600 outline-none transition-all"

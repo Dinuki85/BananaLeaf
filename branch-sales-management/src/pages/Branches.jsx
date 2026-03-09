@@ -39,11 +39,6 @@ const Branches = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!formData.name || !formData.location) {
-            setMessage({ text: 'Please fill in all fields.', type: 'error' });
-            return;
-        }
-
         try {
             setSubmitting(true);
             setMessage({ text: '', type: '' });
@@ -83,6 +78,7 @@ const Branches = () => {
                             </span>
                             <input
                                 type="text"
+                                required
                                 placeholder="Enter branch name"
                                 className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500/20 focus:border-green-600 outline-none transition-all"
                                 value={formData.name}
@@ -99,6 +95,7 @@ const Branches = () => {
                             </span>
                             <input
                                 type="text"
+                                required
                                 placeholder="Enter location"
                                 className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500/20 focus:border-green-600 outline-none transition-all"
                                 value={formData.location}
