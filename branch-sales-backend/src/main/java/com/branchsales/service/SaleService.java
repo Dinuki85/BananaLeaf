@@ -57,9 +57,9 @@ public class SaleService {
     }
 
     private SalesDTO convertToDTO(Invoice invoice) {
-        String branchName = "Central Office";
+        String branchName = "Unknown Branch";
         if (invoice.getBranch() != null) {
-            branchName = invoice.getBranch().getName() != null ? invoice.getBranch().getName() : "Central Office";
+            branchName = invoice.getBranch().getName() != null ? invoice.getBranch().getName() : "Unknown Branch";
         }
     
         return SalesDTO.builder()

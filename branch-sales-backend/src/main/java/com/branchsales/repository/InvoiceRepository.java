@@ -24,7 +24,7 @@ public interface InvoiceRepository extends JpaRepository<Invoice, InvoiceId> {
     @Query("SELECT SUM(i.total) FROM Invoice i")
     Double sumTotalAmount();
 
-    @Query("SELECT new com.branchsales.dto.BranchPerformanceDTO(COALESCE(b.name, 'Central Office'), SUM(i.total)) " +
+    @Query("SELECT new com.branchsales.dto.BranchPerformanceDTO(COALESCE(b.name, 'Unknown Branch'), SUM(i.total)) " +
            "FROM Invoice i LEFT JOIN i.branch b GROUP BY b.name, i.branch")
     List<BranchPerformanceDTO> findBranchPerformance();
 }
