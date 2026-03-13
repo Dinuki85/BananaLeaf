@@ -49,7 +49,7 @@ public class ReportService {
         LocalDateTime[] range = calculateRange(period);
         Timestamp startTimestamp = Timestamp.valueOf(range[0]);
         Timestamp endTimestamp = Timestamp.valueOf(range[1]);
-        
+
         return invoiceRepository.findByFilters(branchId, startTimestamp, endTimestamp).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
@@ -94,7 +94,7 @@ public class ReportService {
             throws Exception {
         Timestamp startTimestamp = Timestamp.valueOf(startDate);
         Timestamp endTimestamp = Timestamp.valueOf(endDate);
-        
+
         List<Invoice> invoices = invoiceRepository.findByFilters(branchId, startTimestamp, endTimestamp);
         Branch selectedBranch = branchId != null ? branchRepository.findById(branchId).orElse(null) : null;
 
@@ -120,7 +120,7 @@ public class ReportService {
             }
 
             Image logo = new Image(imageData);
-            logo.setHeight(80); 
+            logo.setHeight(80);
             headerTable.addCell(new Cell().add(logo).setBorder(Border.NO_BORDER));
         } catch (Exception e) {
             headerTable.addCell(new Cell().setBorder(Border.NO_BORDER));
@@ -150,12 +150,12 @@ public class ReportService {
                 .setFontSize(10).setItalic().setMarginBottom(20));
 
         // Data Table
-        float[] columnWidths = { 2, 3, 3, 2, 2, 2 };
+        float[] columnWidths = { 2, 3, 4, 3, 2 };
         Table table = new Table(UnitValue.createPercentArray(columnWidths));
         table.setWidth(UnitValue.createPercentValue(100));
 
         // Table Headers
-        String[] headers = { "Invoice No", "Date", "Branch", "Payment", "Total Amount", "Status" };
+        String[] headers = { "Invoice No", "Date", "Branch", "Total Amount", "Status" };
         for (String header : headers) {
             table.addHeaderCell(new Cell().add(new Paragraph(header).setBold())
                     .setBackgroundColor(ColorConstants.LIGHT_GRAY)
@@ -181,15 +181,13 @@ public class ReportService {
             }
             table.addCell(new Cell().add(new Paragraph(branchName)).setTextAlignment(TextAlignment.CENTER));
 
-            String paymentType = invoice.getPaymentType() != null ? invoice.getPaymentType() : "N/A";
-            table.addCell(new Cell().add(new Paragraph(paymentType)).setTextAlignment(TextAlignment.CENTER));
-
             double total = invoice.getTotal() != null ? invoice.getTotal() : 0.0;
             table.addCell(new Cell().add(new Paragraph(String.format("$%.2f", total)))
                     .setTextAlignment(TextAlignment.RIGHT));
 
             String status = invoice.getStatus() != null ? invoice.getStatus() : "1";
-            if ("1".equals(status)) status = "Completed";
+            if ("1".equals(status))
+                status = "Completed";
             table.addCell(new Cell().add(new Paragraph(status)).setTextAlignment(TextAlignment.CENTER));
 
             totalSales += total;
@@ -232,8 +230,8 @@ public class ReportService {
             }
 
             Image watermark = new Image(watermarkData);
-            watermark.setWidth(300); 
-            watermark.setOpacity(0.15f); 
+            watermark.setWidth(300);
+            watermark.setOpacity(0.15f);
 
             int numberOfPages = pdf.getNumberOfPages();
             PdfExtGState gState = new PdfExtGState().setFillOpacity(0.15f);
@@ -251,7 +249,8 @@ public class ReportService {
                 watermarkCanvas.close();
                 pdfCanvas.restoreState();
             }
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
 
         document.close();
         return baos.toByteArray();
