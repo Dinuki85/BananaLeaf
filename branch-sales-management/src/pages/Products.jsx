@@ -13,14 +13,13 @@ import {
 const Products = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [categories, setCategories] = useState([{ id: 0, name: 'Unknown' }]); // default category
     const [submitting, setSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         sku: '',
         sellingPrice: '',
         active: true,
-        categoryId: '' // New: selected category
+
     });
     const [message, setMessage] = useState({ text: '', type: '' });
 
@@ -37,10 +36,7 @@ const Products = () => {
             header: 'Status',
             render: (row) => <StatusBadge active={row.active} />
         },
-        {
-            header: 'Category', // Show category in table
-            accessor: 'category'
-        }
+
     ];
 
     const fetchProducts = async () => {
@@ -170,7 +166,7 @@ const Products = () => {
                             </div>
                         </div>
 
-                        {/* Category Dropdown */}
+                        {/* Category Dropdown 
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-gray-600 block">Category</label>
                             <select
@@ -181,17 +177,17 @@ const Products = () => {
                                     setFormData({ ...formData, categoryId: parseInt(e.target.value) })
                                 }
                             >
-                                {/* Always show Unknown as the first/default option */}
-                                <option value={0}>Unknown</option>
-                                {categories
-                                    .filter((cat) => cat.id !== 0) // skip the "Unknown" duplicate if it exists in fetched categories
-                                    .map((cat) => (
-                                        <option key={cat.id} value={cat.id}>
-                                            {cat.name}
-                                        </option>
-                                    ))}
-                            </select>
-                        </div>
+                                {/* Always show Unknown as the first/default option 
+                        <option value={0}>Unknown</option>
+                        {categories
+                            .filter((cat) => cat.id !== 0) // skip the "Unknown" duplicate if it exists in fetched categories
+                            .map((cat) => (
+                                <option key={cat.id} value={cat.id}>
+                                    {cat.name}
+                                </option>
+                            ))}
+                    </select>
+                </div>*/}
 
                         {/* Active Switch & Button */}
                         <div className="flex flex-col justify-end space-y-2">
@@ -212,22 +208,24 @@ const Products = () => {
                             </button>
                         </div>
                     </div>
-                </form>
+                </form >
 
-                {message.text && (
-                    <div className={`mt-6 p-3 rounded-xl text-sm border ${message.type === 'success' ? 'bg-green-50 text-green-700 border-green-100' : 'bg-red-50 text-red-700 border-red-100'
-                        }`}>
-                        {message.text}
-                    </div>
-                )}
-            </section>
+                {
+                    message.text && (
+                        <div className={`mt-6 p-3 rounded-xl text-sm border ${message.type === 'success' ? 'bg-green-50 text-green-700 border-green-100' : 'bg-red-50 text-red-700 border-red-100'
+                            }`}>
+                            {message.text}
+                        </div>
+                    )
+                }
+            </section >
 
             {/* Product List Table */}
-            <section className="space-y-4">
+            < section className="space-y-4" >
                 <h3 className="text-lg font-semibold text-gray-800">Catalogue List</h3>
                 <DataTable columns={columns} data={products} loading={loading} />
-            </section>
-        </div>
+            </section >
+        </div >
     );
 };
 
