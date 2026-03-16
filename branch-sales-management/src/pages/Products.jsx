@@ -51,19 +51,12 @@ const Products = () => {
         }
     };
 
-    const fetchCategories = async () => {
-        try {
-            const res = await api.get('/products/categories');
-            setCategories(res.data);
-        } catch (err) {
-            console.error('Error fetching categories:', err);
-        }
-    };
+
 
     useEffect(() => {
         fetchProducts();
-        fetchCategories();
-    }, []);
+
+    }, [])
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -83,7 +76,7 @@ const Products = () => {
                 sku: '',
                 sellingPrice: '',
                 active: true,
-                categoryId: ''
+
             });
             fetchProducts();
         } catch (err) {
