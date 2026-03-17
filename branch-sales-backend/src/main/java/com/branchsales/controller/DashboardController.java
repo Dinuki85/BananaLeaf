@@ -1,7 +1,9 @@
 package com.branchsales.controller;
 
+import com.branchsales.dto.BranchSalesDTO;
 import com.branchsales.dto.DashboardSummary;
 import com.branchsales.service.DashboardService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -19,5 +21,10 @@ public class DashboardController {
     @GetMapping("/summary")
     public ResponseEntity<DashboardSummary> getSummary() {
         return ResponseEntity.ok(dashboardService.getSummary());
+    }
+
+    @GetMapping("/branch-sales")
+    public ResponseEntity<List<BranchSalesDTO>> getTodayBranchSales() {
+        return ResponseEntity.ok(dashboardService.getTodayBranchSales());
     }
 }
