@@ -35,4 +35,6 @@ public class BranchProductPrice {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
+    private Long version;
 }

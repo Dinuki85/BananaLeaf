@@ -3,6 +3,7 @@ package com.branchsales.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "main_item")
@@ -35,4 +36,16 @@ public class MainItem {
 
     @Column(name = "active")
     private String active;
+
+    @Version
+    private Long version;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

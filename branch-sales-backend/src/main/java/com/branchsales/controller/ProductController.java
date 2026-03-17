@@ -8,7 +8,9 @@ import com.branchsales.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/products")
@@ -36,6 +38,22 @@ public class ProductController {
     @PostMapping("/branch-price")
     public ResponseEntity<Void> updateBranchPrice(@RequestBody BranchPriceRequest request) {
         productService.updateBranchPrice(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/updates")
+    public ResponseEntity<List<ProductDTO>> getUpdates(
+            @RequestParam(name = "branchId") Long branchId,
+            @RequestParam(name = "lastSync") String lastSync) {
+        LocalDateTime lastSyncTime = LocalDateTime.parse(lastSync);
+        return ResponseEntity.ok(productService.getProductsUpdatedSince(branchId, lastSyncTime));
+    }
+
+    @PostMapping("/sync-confirm")
+    public ResponseEntity<Void> confirmSync(@RequestBody Map<String, Object> payload) {
+        Long branchId = Long.valueOf(payload.get("branchId").toString());
+        LocalDateTime syncTime = LocalDateTime.parse(payload.get("syncTime").toString());
+        productService.confirmSync(branchId, syncTime);
         return ResponseEntity.ok().build();
     }
 }

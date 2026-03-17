@@ -13,4 +13,5 @@ public class BranchPriceRequest {
     private Long productId;
     private Long branchId;
     private Double price;
+    private Long version;
 }
