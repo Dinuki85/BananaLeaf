@@ -24,7 +24,7 @@ public class DashboardController {
     }
 
     @GetMapping("/branch-sales")
-    public ResponseEntity<List<BranchSalesDTO>> getTodayBranchSales() {
-        return ResponseEntity.ok(dashboardService.getTodayBranchSales());
+    public ResponseEntity<List<BranchSalesDTO>> getBranchSales() {
+        return ResponseEntity.ok(dashboardService.getAllBranchSales());
     }
 }

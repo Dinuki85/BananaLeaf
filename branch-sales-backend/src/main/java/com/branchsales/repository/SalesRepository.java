@@ -20,10 +20,8 @@ public interface SalesRepository extends JpaRepository<Invoice, InvoiceId> {
     FROM Branch b
     LEFT JOIN Invoice i
     ON i.branch.id = b.id
-    AND DATE(i.createdAt) = CURRENT_DATE
-    AND i.status = 'ACTIVE'
     GROUP BY b.id, b.name
     ORDER BY b.id
     """)
-    List<BranchSalesDTO> getTodayBranchSales();
+    List<BranchSalesDTO> getAllBranchSales();
 }

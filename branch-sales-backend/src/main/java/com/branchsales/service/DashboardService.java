@@ -26,8 +26,8 @@ public class DashboardService {
         this.salesRepository = salesRepository;
     }
 
-    public List<BranchSalesDTO> getTodayBranchSales() {
-        return salesRepository.getTodayBranchSales();
+    public List<BranchSalesDTO> getAllBranchSales() {
+        return salesRepository.getAllBranchSales();
     }
 
     public DashboardSummary getSummary() {
