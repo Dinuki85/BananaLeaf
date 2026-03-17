@@ -15,6 +15,7 @@ public interface SalesRepository extends JpaRepository<Invoice, InvoiceId> {
     b.id,
     b.name,
     COALESCE(SUM(i.total), 0.0),
+    COALESCE(SUM(CASE WHEN CAST(i.createdAt AS date) = CURRENT_DATE THEN i.total ELSE 0.0 END), 0.0),
     COUNT(i.idinvoice)
     )
     FROM Branch b

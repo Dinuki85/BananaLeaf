@@ -11,5 +11,6 @@ public class BranchSalesDTO {
     private Long branchId;
     private String branchName;
     private Double totalSales;
+    private Double todaySales;
     private Long invoiceCount;
 }
