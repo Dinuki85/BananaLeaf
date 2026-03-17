@@ -1,6 +1,7 @@
 package com.branchsales.controller;
 
 import com.branchsales.dto.ProductDTO;
+import com.branchsales.dto.BranchPriceRequest;
 import com.branchsales.entity.MainCategory;
 import com.branchsales.repository.MainCategoryRepository;
 import com.branchsales.service.ProductService;
@@ -18,8 +19,8 @@ public class ProductController {
     private final MainCategoryRepository mainCategoryRepository;
 
     @GetMapping
-    public ResponseEntity<List<ProductDTO>> getAllProducts() {
-        return ResponseEntity.ok(productService.getAllProducts());
+    public ResponseEntity<List<ProductDTO>> getAllProducts(@RequestParam(name = "branchId", required = false) Long branchId) {
+        return ResponseEntity.ok(productService.getAllProducts(branchId));
     }
 
     @GetMapping("/categories")
@@ -30,5 +31,11 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<ProductDTO> addProduct(@RequestBody ProductDTO product) {
         return ResponseEntity.ok(productService.addProduct(product));
+    }
+
+    @PostMapping("/branch-price")
+    public ResponseEntity<Void> updateBranchPrice(@RequestBody BranchPriceRequest request) {
+        productService.updateBranchPrice(request);
+        return ResponseEntity.ok().build();
     }
 }

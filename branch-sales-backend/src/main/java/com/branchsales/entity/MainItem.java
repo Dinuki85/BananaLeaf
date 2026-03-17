@@ -24,9 +24,15 @@ public class MainItem {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "sp")
-    private Double price;
-
     @Column(name = "code")
     private String code;
+
+    @Column(name = "up")
+    private Double unitPrice;
+
+    @Column(name = "sp")
+    private Double sellingPrice;
+
+    @Column(name = "active")
+    private String active;
 }
