@@ -7,6 +7,8 @@ const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Branches = lazy(() => import('./pages/Branches'));
 const Products = lazy(() => import('./pages/Products'));
 const Sales = lazy(() => import('./pages/Sales'));
+const Dealers = lazy(() => import('./pages/Dealers'));
+const StockManagement = lazy(() => import('./pages/StockManagement'));
 
 // Loading Fallback
 const LoadingScreen = () => (
@@ -29,6 +31,8 @@ function App() {
             <Route path="branches" element={<Branches />} />
             <Route path="products" element={<Products />} />
             <Route path="sales" element={<Sales />} />
+            <Route path="dealers" element={<Dealers />} />
+            <Route path="stock" element={<StockManagement />} />
           </Route>
           {/* Catch all redirect to dashboard */}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

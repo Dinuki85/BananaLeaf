@@ -145,7 +145,7 @@ const Sales = () => {
                                 <p className="text-xs text-gray-400 uppercase font-bold tracking-wider">Branch</p>
                                 <div className="flex items-center text-gray-700 font-semibold">
                                     <BuildingStorefrontIcon className="w-4 h-4 mr-2 text-green-600" />
-                                    {selectedSale.branch?.name}
+                                    {selectedSale.branchName || 'Central Branch'}
                                 </div>
                             </div>
                             <div className="text-right">

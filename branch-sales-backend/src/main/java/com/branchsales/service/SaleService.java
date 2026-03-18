@@ -62,12 +62,23 @@ public class SaleService {
             branchName = invoice.getBranch().getName() != null ? invoice.getBranch().getName() : "Unknown Branch";
         }
     
+        java.sql.Timestamp saleDateTime = invoice.getCreatedAt();
+        if (saleDateTime == null && invoice.getDate() != null) {
+            try {
+                // If created_at is null, try to parse the 'date' string (yyyy-MM-dd)
+                java.time.LocalDate localDate = java.time.LocalDate.parse(invoice.getDate());
+                saleDateTime = java.sql.Timestamp.valueOf(localDate.atStartOfDay());
+            } catch (Exception e) {
+                // Fallback to current time if parsing fails
+            }
+        }
+
         return SalesDTO.builder()
                 .id(invoice.getId())
                 .invoiceLocal(invoice.getIdinvoice())
                 .branchName(branchName)
                 .branchId(invoice.getBranchId() != null ? invoice.getBranchId() : 0L)
-                .saleDateTime(invoice.getCreatedAt())
+                .saleDateTime(saleDateTime)
                 .totalAmount(invoice.getTotal())
                 .paymentType(invoice.getPaymentType())
                 .status(invoice.getStatus())
