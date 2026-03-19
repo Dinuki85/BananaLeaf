@@ -41,4 +41,16 @@ public class BranchService {
         
         return savedBranch;
     }
+
+    @Transactional
+    public Branch updateBranch(Long id, Branch branchDetails) {
+        Branch branch = branchRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Branch not found with id: " + id));
+        
+        branch.setName(branchDetails.getName());
+        branch.setLocation(branchDetails.getLocation());
+        branch.setStatus(branchDetails.getStatus());
+        
+        return branchRepository.save(branch);
+    }
 }
