@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "main_item")
@@ -20,6 +21,7 @@ public class MainItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "main_category_idmain_category")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private MainCategory mainCategory;
 
     @Column(name = "name")

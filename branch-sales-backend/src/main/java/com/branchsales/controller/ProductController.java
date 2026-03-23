@@ -2,6 +2,8 @@ package com.branchsales.controller;
 
 import com.branchsales.dto.ProductDTO;
 import com.branchsales.dto.BranchPriceRequest;
+import com.branchsales.dto.BranchProductDTO;
+import com.branchsales.dto.BranchProductUpdateRequest;
 import com.branchsales.entity.MainCategory;
 import com.branchsales.repository.MainCategoryRepository;
 import com.branchsales.service.ProductService;
@@ -23,6 +25,16 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<List<ProductDTO>> getAllProducts(@RequestParam(name = "branchId", required = false) Long branchId) {
         return ResponseEntity.ok(productService.getAllProducts(branchId));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<ProductDTO>> searchProducts(@RequestParam(name = "name") String name) {
+        return ResponseEntity.ok(productService.searchProducts(name));
+    }
+
+    @GetMapping("/{productId}/branches")
+    public ResponseEntity<List<BranchProductDTO>> getProductBranches(@PathVariable Long productId) {
+        return ResponseEntity.ok(productService.getProductBranches(productId));
     }
 
     @GetMapping("/categories")

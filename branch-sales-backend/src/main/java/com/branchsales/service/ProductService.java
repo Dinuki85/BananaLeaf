@@ -1,17 +1,25 @@
 package com.branchsales.service;
 
 import com.branchsales.dto.ProductDTO;
+import com.branchsales.dto.CentralStockDTO;
 import com.branchsales.dto.BranchPriceRequest;
+import com.branchsales.repository.CentralStockRepository;
 import com.branchsales.entity.MainItem;
 import com.branchsales.entity.MainCategory;
 import com.branchsales.repository.MainItemRepository;
 import com.branchsales.repository.MainCategoryRepository;
-import com.branchsales.repository.BranchProductPriceRepository;
+import com.branchsales.repository.BranchProductRepository;
+import com.branchsales.repository.BranchRepository;
 import com.branchsales.repository.SyncLogRepository;
 import com.branchsales.repository.BranchSyncStatusRepository;
-import com.branchsales.entity.BranchProductPrice;
+import com.branchsales.dto.BranchProductDTO;
+import com.branchsales.dto.BranchProductUpdateRequest;
+import com.branchsales.entity.Branch;
+import com.branchsales.entity.BranchProduct;
 import com.branchsales.entity.SyncLog;
 import com.branchsales.entity.BranchSyncStatus;
+import com.branchsales.entity.BranchProductPrice;
+import com.branchsales.repository.BranchProductPriceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,29 +35,100 @@ import java.util.stream.Collectors;
 public class ProductService {
     private final MainItemRepository mainItemRepository;
     private final MainCategoryRepository mainCategoryRepository;
-    private final BranchProductPriceRepository branchProductPriceRepository;
+    private final BranchProductRepository branchProductRepository;
+    private final BranchRepository branchRepository;
     private final SyncLogRepository syncLogRepository;
     private final BranchSyncStatusRepository branchSyncStatusRepository;
     private final CloudChangeLogService cloudChangeLogService;
+    private final BranchProductPriceRepository branchProductPriceRepository;
+    private final CentralStockRepository centralStockRepository;
 
     // Fetch all products with branch pricing logic
     public List<ProductDTO> getAllProducts(Long branchId) {
         List<MainItem> items = mainItemRepository.findAll();
         
-        // If branchId is provided, get the branch-specific prices
         Map<Long, Double> branchPrices = new HashMap<>();
+        Map<Long, Boolean> branchAvailability = new HashMap<>();
+        
         if (branchId != null) {
-            branchProductPriceRepository.findByBranchId(branchId)
-                .forEach(bpp -> {
-                    if (bpp.getProduct() != null) {
-                        branchPrices.put(bpp.getProduct().getId(), bpp.getPrice());
+            branchProductRepository.findByBranchId(branchId)
+                .forEach(bp -> {
+                    if (bp.getProduct() != null) {
+                        branchPrices.put(bp.getProduct().getId(), bp.getBranchPrice());
+                        branchAvailability.put(bp.getProduct().getId(), bp.getIsAvailable());
                     }
                 });
         }
 
         return items.stream()
-                .map(item -> convertToDTO(item, branchPrices.get(item.getId())))
+                .map(item -> convertToDTO(item, branchPrices.get(item.getId()), branchAvailability.get(item.getId())))
                 .collect(Collectors.toList());
+    }
+
+    public List<ProductDTO> searchProducts(String name) {
+        List<MainItem> items = mainItemRepository.findAll().stream()
+                .filter(item -> item.getName().toLowerCase().contains(name.toLowerCase()))
+                .collect(Collectors.toList());
+        
+        return items.stream()
+                .map(item -> convertToDTO(item, null, null))
+                .collect(Collectors.toList());
+    }
+
+    public List<BranchProductDTO> getProductBranches(Long productId) {
+        MainItem product = mainItemRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+        
+        List<Branch> allBranches = branchRepository.findAll();
+        List<BranchProduct> branchProducts = branchProductRepository.findByProductId(productId);
+        
+        Map<Long, BranchProduct> bpMap = branchProducts.stream()
+                .collect(Collectors.toMap(bp -> bp.getBranch().getId(), bp -> bp));
+        
+        return allBranches.stream()
+                .map(branch -> {
+                    BranchProduct bp = bpMap.get(branch.getId());
+                    return BranchProductDTO.builder()
+                            .branchId(branch.getId())
+                            .branchName(branch.getName())
+                            .productId(productId)
+                            .productName(product.getName())
+                            .branchPrice(bp != null ? bp.getBranchPrice() : product.getSellingPrice())
+                            .isAvailable(bp != null ? bp.getIsAvailable() : true)
+                            .isPriceUpdated(bp != null ? bp.getIsPriceUpdated() : false)
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void updateBranchProducts(BranchProductUpdateRequest request) {
+        for (BranchProductDTO dto : request.getUpdates()) {
+            BranchProduct bp = branchProductRepository.findByBranchIdAndProductId(dto.getBranchId(), dto.getProductId())
+                    .orElseGet(() -> {
+                        Branch branch = branchRepository.findById(dto.getBranchId())
+                                .orElseThrow(() -> new RuntimeException("Branch not found"));
+                        MainItem product = mainItemRepository.findById(dto.getProductId())
+                                .orElseThrow(() -> new RuntimeException("Product not found"));
+                        return BranchProduct.builder()
+                                .branch(branch)
+                                .product(product)
+                                .build();
+                    });
+
+            boolean isPriceChanged = dto.getBranchPrice() != null && !dto.getBranchPrice().equals(bp.getBranchPrice());
+            boolean isAvailabilityChanged = dto.getIsAvailable() != null && !dto.getIsAvailable().equals(bp.getIsAvailable());
+
+            if (isPriceChanged || isAvailabilityChanged) {
+                // If branchPrice is null (cleared in UI), reset to product's default selling price
+                Double newPrice = dto.getBranchPrice() != null ? dto.getBranchPrice() : bp.getProduct().getSellingPrice();
+                bp.setBranchPrice(newPrice);
+                
+                bp.setIsAvailable(dto.getIsAvailable() != null ? dto.getIsAvailable() : bp.getIsAvailable());
+                bp.setIsPriceUpdated(true); // Always mark as overridden when edited/cleared
+                branchProductRepository.save(bp);
+            }
+        }
     }
 
     public List<ProductDTO> getAllProducts() {
@@ -117,6 +196,42 @@ public class ProductService {
                 .build();
 
         MainItem saved = mainItemRepository.save(mainItem);
+        
+        // Create branch_products records for all branches
+        List<Branch> branches = branchRepository.findAll();
+        System.out.println("Processing " + branches.size() + " branches for new product: " + saved.getName());
+        if (productDTO.getBranchProducts() != null) {
+            System.out.println("Provided branch products count: " + productDTO.getBranchProducts().size());
+        }
+
+        for (Branch branch : branches) {
+            Double branchPrice = saved.getSellingPrice();
+            boolean isOverridden = true; 
+
+            if (productDTO.getBranchProducts() != null) {
+                BranchProductDTO specificDTO = productDTO.getBranchProducts().stream()
+                        .filter(bpDTO -> bpDTO.getBranchId() != null && bpDTO.getBranchId().equals(branch.getId()))
+                        .findFirst()
+                        .orElse(null);
+                
+                if (specificDTO != null) {
+                    System.out.println("Found match for branch " + branch.getName() + " (ID " + branch.getId() + "): " + specificDTO.getBranchPrice());
+                    if (specificDTO.getBranchPrice() != null) {
+                        branchPrice = specificDTO.getBranchPrice();
+                    }
+                }
+            }
+
+            BranchProduct bp = BranchProduct.builder()
+                    .branch(branch)
+                    .product(saved)
+                    .branchPrice(branchPrice)
+                    .isAvailable(true)
+                    .isPriceUpdated(isOverridden)
+                    .build();
+            branchProductRepository.save(bp);
+        }
+
         logSyncRecord("product", saved.getId(), null, "INSERT", saved.getVersion());
 
         // Phase 1: Cloud Change Log Integration
@@ -128,7 +243,7 @@ public class ProductService {
             null
         );
 
-        return convertToDTO(saved, null);
+        return convertToDTO(saved, null, null);
     }
 
     public List<ProductDTO> getProductsUpdatedSince(Long branchId, LocalDateTime lastSync) {
@@ -136,10 +251,13 @@ public class ProductService {
         
         // Get branch specific prices for these items
         Map<Long, Double> branchPrices = new HashMap<>();
-        branchProductPriceRepository.findByBranchId(branchId)
-            .forEach(bpp -> {
-                if (bpp.getProduct() != null) {
-                    branchPrices.put(bpp.getProduct().getId(), bpp.getPrice());
+        Map<Long, Boolean> branchAvailability = new HashMap<>();
+        
+        branchProductRepository.findByBranchId(branchId)
+            .forEach(bp -> {
+                if (bp.getProduct() != null) {
+                    branchPrices.put(bp.getProduct().getId(), bp.getBranchPrice());
+                    branchAvailability.put(bp.getProduct().getId(), bp.getIsAvailable());
                 }
             });
 
@@ -148,20 +266,17 @@ public class ProductService {
                     // Check if item was updated globally
                     boolean itemUpdated = item.getUpdatedAt() != null && item.getUpdatedAt().isAfter(lastSync);
                     
-                    // Check if branch price was updated
-                    // We need the branch price record to check its updatedAt
-                    Optional<BranchProductPrice> bpp = branchProductPriceRepository.findByProductIdAndBranchId(item.getId(), branchId);
-                    boolean priceUpdated = bpp.isPresent() && bpp.get().getUpdatedAt() != null && bpp.get().getUpdatedAt().isAfter(lastSync);
+                    // Check if branch settings were updated
+                    Optional<BranchProduct> bp = branchProductRepository.findByBranchIdAndProductId(branchId, item.getId());
+                    boolean settingsUpdated = bp.isPresent() && bp.get().getUpdatedAt() != null && bp.get().getUpdatedAt().isAfter(lastSync);
                     
-                    return itemUpdated || priceUpdated;
+                    return itemUpdated || settingsUpdated;
                 })
                 .map(item -> {
-                    ProductDTO dto = convertToDTO(item, branchPrices.get(item.getId()));
-                    // Ensure the DTO has the correct updatedAt for sync logic
-                    // If the price was the reason for sync, use price's updatedAt
-                    Optional<BranchProductPrice> bpp = branchProductPriceRepository.findByProductIdAndBranchId(item.getId(), branchId);
-                    if (bpp.isPresent() && bpp.get().getUpdatedAt() != null && (item.getUpdatedAt() == null || bpp.get().getUpdatedAt().isAfter(item.getUpdatedAt()))) {
-                        dto.setUpdatedAt(bpp.get().getUpdatedAt());
+                    ProductDTO dto = convertToDTO(item, branchPrices.get(item.getId()), branchAvailability.get(item.getId()));
+                    Optional<BranchProduct> bp = branchProductRepository.findByBranchIdAndProductId(branchId, item.getId());
+                    if (bp.isPresent() && bp.get().getUpdatedAt() != null && (item.getUpdatedAt() == null || bp.get().getUpdatedAt().isAfter(item.getUpdatedAt()))) {
+                        dto.setUpdatedAt(bp.get().getUpdatedAt());
                     } else {
                         dto.setUpdatedAt(item.getUpdatedAt());
                     }
@@ -193,11 +308,25 @@ public class ProductService {
         syncLogRepository.save(log);
     }
 
-    private ProductDTO convertToDTO(MainItem item, Double branchPrice) {
+    private ProductDTO convertToDTO(MainItem item, Double branchPrice, Boolean isAvailable) {
         String sku = item.getCode() != null ? item.getCode() : (item.getId() != null ? "PROD-" + item.getId() : "N/A");
         
         // Use branch price if exists, otherwise use default sellingPrice
         Double finalSellingPrice = branchPrice != null ? branchPrice : item.getSellingPrice();
+
+        // Fetch central stock batches for this product
+        List<CentralStockDTO> batches = centralStockRepository
+                .findByProductIdAndRemainingQuantityGreaterThanOrderByCreatedAtAsc(item.getId(), 0.0)
+                .stream()
+                .map(batch -> CentralStockDTO.builder()
+                        .id(batch.getId())
+                        .quantity(batch.getQuantity())
+                        .remainingQuantity(batch.getRemainingQuantity())
+                        .costPrice(batch.getCostPrice())
+                        .dealerName(batch.getDealer() != null ? batch.getDealer().getName() : "Direct")
+                        .createdAt(batch.getCreatedAt())
+                        .build())
+                .collect(Collectors.toList());
 
         return ProductDTO.builder()
                 .id(item.getId())
@@ -205,8 +334,9 @@ public class ProductService {
                 .name(item.getName())
                 .price(item.getUnitPrice())
                 .sellingPrice(finalSellingPrice)
-                .active("1".equals(item.getActive()) || "true".equalsIgnoreCase(item.getActive()))
+                .active(isAvailable != null ? isAvailable : ("1".equals(item.getActive()) || "true".equalsIgnoreCase(item.getActive())))
                 .category("") // DO NOT RETURN CATEGORY (as requested)
+                .centralStock(batches)
                 .build();
     }
 }

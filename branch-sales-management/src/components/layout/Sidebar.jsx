@@ -6,7 +6,9 @@ import {
     MapPinIcon,
     Squares2X2Icon,
     ChartBarIcon,
-    XMarkIcon
+    XMarkIcon,
+    UserGroupIcon,
+    InboxStackIcon
 } from '@heroicons/react/24/outline';
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
@@ -15,6 +17,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         { name: 'Branches', path: '/branches', icon: MapPinIcon },
         { name: 'Product Catalogue', path: '/products', icon: Squares2X2Icon },
         { name: 'Sales Report', path: '/sales', icon: ChartBarIcon },
+        { name: 'Dealers', path: '/dealers', icon: UserGroupIcon },
+        { name: 'Stock Management', path: '/stock', icon: InboxStackIcon },
     ];
 
     const activeStyles = "bg-green-600 text-white shadow-md";
